@@ -26,12 +26,16 @@ module cla4(
   input  [3:0] b,
   input        cin,
   output [3:0] sum,
-  output       cout
+  output       cout,
+  // Block-level summaries, needed by the second-level lookahead unit in
+  // cla64_hier.v. Leave unconnected if you only want a plain 4-bit CLA.
+  output       gblk,   // this block generates a carry regardless of cin
+  output       pblk    // an incoming carry propagates straight through
 );
 
   wire p0, p1, p2, p3;
   wire g0, g1, g2, g3;
-  wire c1, c2, c3, c4;
+  wire c1, c2, c3;
 
   // TODO: your gate-level P/G, carry, and sum logic goes here.
   // (cout should be connected to c4.) Remember the delay on every gate.
@@ -67,13 +71,17 @@ wire t1;
   and #(2) (t8, p3, p2, g1);
   and #(2) (t9, p3, p2, p1, g0);
   and #(2) (t10, p3, p2, p1, p0, cin);
-  or  #(2) (c4, g3, t7, t8, t9, t10);
+  or  #(2) (cout, g3, t7, t8, t9, t10);
+
+  // Block generate / propagate -- reuses the same product terms as c4,
+  // just without the p3.p2.p1.p0.cin term.
+  or  #(2) (gblk, g3, t7, t8, t9);
+  and #(2) (pblk, p3, p2, p1, p0);
 
   xor #(2) (sum[0], p0, cin);
   xor #(2) (sum[1], p1, c1);
   xor #(2) (sum[2], p2, c2);
   xor #(2) (sum[3], p3, c3);
 
-  assign cout = c4;
   
 endmodule
