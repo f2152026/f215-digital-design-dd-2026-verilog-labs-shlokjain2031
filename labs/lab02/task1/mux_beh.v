@@ -9,7 +9,7 @@ module mux_beh (
   input       I0,
   input       I1,
   input       S,
-  output wire Y
+  output reg  Y     // behavioral output assigned in always must be a reg
 );
 
   always @(*) begin

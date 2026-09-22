@@ -1,20 +1,23 @@
 // tb.v
-// Starter testbench template -- YOU complete this file.
+// Completed testbench for the 2-to-1 MUX (Task 1).
 //
-// Goal: apply all 8 combinations of I0, I1, S (5 time units apart) to DUT
-// and observe the output. Fill in every TODO below.
+// Applies all 8 combinations of I0, I1, S (5 time units apart) to DUT
+// and observes the output.
 
 module tb;
 
-  // TODO: declare the three DUT inputs as the appropriate variable type.
-  // Use exactly these names: t_i0, t_i1, t_s (needed by $monitor below).
-  reg   ________________________;
-  // TODO: declare the DUT output as the appropriate net type.
-  // Use exactly this name: t_y (needed by $monitor below).
-  wire  ________________________;
+  // Three DUT inputs are stimulus -> reg (driven from procedural code).
+  reg   t_i0, t_i1, t_s;
+  // DUT output is a net driven by the DUT -> wire.
+  wire  t_y;
 
-  // TODO: instantiate DUT here, connecting t_i0, t_i1, t_s, t_y to its ports
-
+  // Instantiate the DUT wrapper (dut.v selects mux_df or mux_beh internally).
+  DUT DUT (
+    .I0 (t_i0),
+    .I1 (t_i1),
+    .S  (t_s),
+    .Y  (t_y)
+  );
 
   // Waveform dump configuration
   string vcd_file;
@@ -25,10 +28,14 @@ module tb;
     end
   end
 
+  integer i;
   initial begin
-    // TODO: apply all 8 combinations of t_i0, t_i1, t_s, 5 time units apart,
-    // then $finish. (Same pattern you used in Lab 1's tb.v.)
-
+    // Apply all 8 combinations of {I0, I1, S}, 5 time units apart.
+    for (i = 0; i < 8; i = i + 1) begin
+      {t_i0, t_i1, t_s} = i[2:0];
+      #5;
+    end
+    $finish;
   end
 
   initial

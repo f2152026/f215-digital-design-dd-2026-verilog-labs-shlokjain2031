@@ -9,7 +9,7 @@ module mux_df (
   input      I0,
   input      I1,
   input      S,
-  output reg Y
+  output     Y      // dataflow output must be a net, not a reg
 );
 
   assign Y = S ? I1 : I0;

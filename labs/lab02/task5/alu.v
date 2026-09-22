@@ -22,15 +22,20 @@ module alu (
   reg [3:0] b_inv;
   reg [3:0] b_twos;
 
-  always @(a, b) begin
+  // Bug 1 fix: op must be in the sensitivity list, else result does not
+  // update when only op changes.
+  always @(a, b, op) begin
     case (op)
       1'b0: begin
         result = a + b;                 // add
       end
       1'b1: begin
-        b_inv  <= ~b;                   // sub, via two's complement
-        b_twos <= b_inv + 1;
-        result <= a + b_twos;
+        // Bug 2 fix: this is a combinational dependency chain
+        // (b_inv -> b_twos -> result). Use blocking assignments so each
+        // step sees the value computed just before it.
+        b_inv  = ~b;                    // sub, via two's complement
+        b_twos = b_inv + 1;
+        result = a + b_twos;
       end
     endcase
   end
